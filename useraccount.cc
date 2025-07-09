@@ -8,6 +8,7 @@ bool usermanager::register_user()
     {
         if (get_password())
         {
+            cout<<"注册成功!"<<endl;
             return true;
         } 
         cout << "是否继续注册？(y/n): ";
@@ -68,6 +69,7 @@ int usermanager::user_login(string user_name,string user_password)
             {
                 current_user = user.user_name;
                 std::cout << "登入成功!" << std::endl;
+                std::cout<<"当前登录用户为"<<user_name<<std::endl;
                 return 0;
             } 
             else 
