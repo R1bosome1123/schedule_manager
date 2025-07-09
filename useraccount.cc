@@ -45,10 +45,9 @@ bool usermanager::get_password()
         }
         ofstream file("account.dat",ios::app);
         
-        int user_id=update_maxid();
-        file<<user_name<<" "<<user_password<<" "<<user_id<<endl;
-        userlist.push_back(useraccount(user_name,user_password,user_id));
-        current_user=user_id;
+        file<<user_name<<" "<<user_password<<endl;
+        userlist.push_back(useraccount(user_name,user_password));
+        current_user=user_name;
         return true;
     }
     else
@@ -58,7 +57,7 @@ bool usermanager::get_password()
     }    
 }
 
-//登录函数
+//登录函数 返回1则表示登录失败，返回0表示登录成功
 int usermanager::user_login(string user_name,string user_password)
 {
     for (const auto& user : userlist) 
@@ -67,20 +66,20 @@ int usermanager::user_login(string user_name,string user_password)
         {
             if (user.user_password == user_password) 
             {
-                current_user = user.user_id;
+                current_user = user.user_name;
                 std::cout << "登入成功!" << std::endl;
-                return current_user;
+                return 0;
             } 
             else 
             {
                 std::cout << "密码错误!" << std::endl;
-                return 0;
+                return 1;
             }
         }
     }
     
     cout<<"用户不存在!";
-    return 0;
+    return 1;
 }
 
 //登录的重载函数
@@ -94,33 +93,6 @@ int usermanager::user_login()
     cin>>user_password;
 
     return user_login(user_name,user_password);
-}
-
-
-int usermanager::get_maxid()
-{
-    fstream idfile("id_counter.dat");
-    int maxid=0;
-    idfile>>maxid;
-    idfile.close();
-    return maxid;
-}
-
-
-int usermanager::update_maxid()
-{
-    int maxid = 0;
-    {
-        ifstream file("id_counter.dat");
-        file >> maxid;
-    }
-
-    {
-        ofstream file("id_counter.dat", ios::trunc);
-        file << (maxid + 1);
-    }
-    maxid++;
-    return maxid;
 }
 
 //usermanager的构造函数
