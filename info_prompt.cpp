@@ -5,28 +5,22 @@
 #include "info_prompt.h"
 using namespace std;
 
-void quit_program()
+void info_prompt::quit_program()
 {
     cout<<"Exiting the program. Goodbye!"<<endl;
     sleep(1); // Sleep for 1 second before exiting
 }
 
 
-void get_user_credentials(string &username, string &password)
+void info_prompt::log_out(string &user_name , vector<task> &tasks)
 {
-    cout<<"Username: ";
-    cin>>username;
-    if(username == "quit") {
-        return; // Exit if user types 'quit'
-    }
-    // Prompt for password
-    cout<<"Please enter your password."<<endl;
-    cout<<"Note: Passwords are case-sensitive."<<endl;
-    cout<<"Password: ";
-    cin>>password;
+    cout<<"You have been logged out."<<endl;
+    current_user_name.clear();
+    tasks.clear(); 
 }
 
-void welcome_message()
+
+void info_prompt::welcome_message()
 {
     cout<<"Welcome to the Task Manager!"<<endl;
     cout<<"Please enter your credentials to continue."<<endl;
