@@ -8,18 +8,15 @@
 #include <unistd.h>
 #include <chrono>
 #include <ctime>
+#include "scan.h"
 using namespace std;
 
-void Chen_Function(function<void(vector<task>&)> lock_access) 
+void scan::scan_due_task(function<void(vector<task>&)> lock_access)
 {
-   while(true)
-   {
-        
         lock_access(examine_task);
         this_thread::sleep_for(chrono::seconds(1)); 
-   }
 }
-void examine_task(vector<task>& tasks) 
+void scan::examine_task(vector<task>& tasks) 
 {
     if (tasks.empty())
         return;
@@ -27,7 +24,7 @@ void examine_task(vector<task>& tasks)
     auto it = tasks.begin();
     if(it->time == now)
     {
-        cout<<it.shedule<<endl;
+        it->show();
         tasks.erase(it);
     }
 }

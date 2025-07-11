@@ -10,27 +10,18 @@
 #include <ctime>
 using namespace std;
 
-void Chen_Function(function<void(vector<task>&)> lock_access) 
+class scan
 {
-   while(true)
-   {
-        
-        lock_access(examine_task);
-        this_thread::sleep_for(chrono::seconds(1)); 
-   }
+private:
+    string user_name;  
+public:
+    scan(string name) : user_name(name) {}
+    void scan_due_task(function<void(vector<task>&)> lock_access);
+    void examine_task(vector<task>& tasks) ;
 }
-void examine_task(vector<task>& tasks) 
-{
-    if (tasks.empty())
-        return;
-    auto now = time(nullptr);
-    auto it = tasks.begin();
-    if(it->time == now)
-    {
-        cout<<it.shedule<<endl;
-        tasks.erase(it);
-    }
-}
+
+
+
 
 
  
