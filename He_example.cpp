@@ -3,6 +3,7 @@ void He_Function(function<void(vector<task>&)> lock_access)
     auto read_from_files_known = [](const string& user_name) {
         read_from_file(user_name, tasks);
     };
+    lock_access(read_from_files_known);
     task current_task;
     task_info_guide();
     input_change_task(&current_task);

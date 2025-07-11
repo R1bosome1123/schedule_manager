@@ -10,14 +10,11 @@
 #include <functional>
 #include <string>
 using namespace std;
-
-
-
 void task_manager::solve_new_task(function<void(vector<task>&)> lock_access)
     {
         
         int mode;
-        task_info_guide(&mode); // 显示任务输入提示
+        task_info_guide(mode); // 显示任务输入提示
         switch (mode)
         {
         case 0:
@@ -95,22 +92,22 @@ void task_manager::load_tasks(vector<task>& tasks) {
     sort_tasks(tasks);
 }
 void task_manager::add_task(const task& t,vector<task>& tasks) 
-    {
-        // 检查是否有相同的 taskName + startTime
-        auto it = find_if(tasks.begin(), tasks.end(), [&](const task& existing) {
-            return existing.taskName == t.taskName && existing.startTime == t.startTime;
-        });
-        if (it != tasks.end()) {
-            cout << "该任务已存在，添加失败！" << endl;
-            return;
-        }
-
-        tasks.push_back(t);
-        sort_tasks(tasks);
-        cout << "任务添加成功" << endl;
-
-        if(tasks.size() >= 5) save_tasks();//自动保存
+{
+    // 检查是否有相同的 taskName + startTime
+    auto it = find_if(tasks.begin(), tasks.end(), [&](const task& existing) {
+        return existing.taskName == t.taskName && existing.startTime == t.startTime;
+    });
+    if (it != tasks.end()) {
+        cout << "该任务已存在，添加失败！" << endl;
+        return;
     }
+
+    tasks.push_back(t);
+    sort_tasks(tasks);
+    cout << "任务添加成功" << endl;
+
+    if(tasks.size() >= 5) save_tasks(tasks);//自动保存
+}
 
 void task_manager::show_tasks(vector<task>& tasks) const 
 {
