@@ -6,7 +6,7 @@
 #include <functional>
 
 #include "thread"
-#include "flag.h"
+#include "FLAG.h"
 using namespace std;
 
 template<typename Function, typename SharedType>

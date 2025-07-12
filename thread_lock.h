@@ -6,7 +6,7 @@
 using namespace std;
 
 template<typename Function,typename SharedType>
-void call_with_lock(Function task_func, SharedType& shared, mutex& mtx);
+void call_with_lock(Function task_func, SharedType& shared,atomic<FLAG>& flag, mutex& mtx);
 
 
 

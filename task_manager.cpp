@@ -30,11 +30,11 @@ void task_manager::solve_new_task(function<void(vector<task>&)> lock_access)
         break;
         
     case 1:
-        lock_access(show_tasks); // 显示当前任务
+        lock_access([&](vector<task>& tasks){this->show_tasks(tasks);}); // 显示当前任务
         break;
 
     case 2:
-        lock_access(save_tasks); // 保存任务到文件
+        lock_access([&](vector<task>& tasks){this->save_tasks(tasks);}); // 保存任务到文件
         Flag= WAIT_LOGGED_IN; // 设置标志位为等待登录
         break;
     }

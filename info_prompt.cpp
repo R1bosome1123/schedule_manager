@@ -2,7 +2,10 @@
 #include <string>
 #include <unistd.h> 
 #include <atomic>
+#include <vector>
+
 #include "info_prompt.h"
+#include "task.h"
 using namespace std;
 
 void info_prompt::quit_program()
@@ -15,7 +18,7 @@ void info_prompt::quit_program()
 void info_prompt::log_out(string &user_name , vector<task> &tasks)
 {
     cout<<"You have been logged out."<<endl;
-    current_user_name.clear();
+    user_name.clear();
     tasks.clear(); 
 }
 
@@ -26,3 +29,4 @@ void info_prompt::welcome_message()
     cout<<"Please enter your credentials to continue."<<endl;
     cout<<"Type 'quit' to exit the program."<<endl;
 }
+
