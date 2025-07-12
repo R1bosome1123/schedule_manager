@@ -51,7 +51,7 @@ int main()
                 task_manager task_manager(current_user_name,current_user_tasks);
                 scan scaner(current_user_name);
 
-                auto modified_add_task=[&](){call_with_lock(task_manager.deal_new_task, current_user_tasks,flag,mtx)}; 
+                auto modified_add_task=[&](){call_with_lock(task_manager.solve_new_task, current_user_tasks,flag,mtx)}; 
                 auto modified_scan_task=[&](){call_with_lock(scaner.scan_due_task, current_user_tasks,flag,mtx)}; 
                 thread t1(modified_add_task); // Start a thread for task management input
                 thread t2(modified_scan_task); // Start a thread for task management scan and output

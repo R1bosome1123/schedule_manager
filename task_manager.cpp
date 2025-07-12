@@ -24,7 +24,7 @@ void task_manager::solve_new_task(function<void(vector<task>&)> lock_access)
     {
     case 0:
         task new_task;
-        input_change_task(&new_task); // 输入任务信息
+        input_change_task(new_task); // 输入任务信息
         auto add_task_known=[&](vector<task>&tasks){add_task(new_task, tasks);};
         lock_access(add_task_known); // 添加任务
         break;
@@ -116,11 +116,13 @@ void task_manager::add_task(const task& t,vector<task>& tasks)
 
 void task_manager::show_tasks(vector<task>& tasks) const 
 {
-        if(tasks.size() == 0){
-            cout << "当前无任务!" << endl;
-            return;
-        }
-        for(const auto &t : tasks){ /////遍历输出/////
-            t.show();
-        }
+    if(tasks.size() == 0)
+    {
+        cout << "当前无任务!" << endl;
+        return;
+    }
+    for(const auto &t : tasks)
+    { /////遍历输出/////
+        t.show();
+    }
 }

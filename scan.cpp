@@ -9,6 +9,10 @@
 #include <chrono>
 #include <ctime>
 #include "scan.h"
+#include "task.h"
+#include "FLAG.h"
+#include "task_manager.h"
+#include "schedule.h"
 using namespace std;
 
 void scan::scan_due_task(function<void(vector<task>&)> lock_access)
