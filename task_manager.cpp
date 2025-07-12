@@ -1,4 +1,4 @@
-#include "schedule.h"
+// #include "schedule.h"
 #include "useraccou#int.h"
 #include "task.h"
 #include "FLAG.h"
@@ -41,7 +41,7 @@ void task_manager::solve_new_task(function<void(vector<task>&)> lock_access)
 }
 
 
-// 简单 hash 函数（在 schedule.h 里也有，建议移过去）
+// 简单 hash 函数
 string task_manager::hash_username(const string &username)
 {
     hash<string> hasher;
@@ -116,13 +116,11 @@ void task_manager::add_task(const task& t,vector<task>& tasks)
 
 void task_manager::show_tasks(vector<task>& tasks) const 
 {
-    if(tasks.size() == 0)
-    {
-        cout << "当前无任务!" << endl;
-        return;
-    }
-    for(const auto &t : tasks)
-    { /////遍历输出/////
-        t.show();
-    }
+        if(tasks.size() == 0){
+            cout << "当前无任务!" << endl;
+            return;
+        }
+        for(const auto &t : tasks){ /////遍历输出/////
+            t.show();
+        }
 }
