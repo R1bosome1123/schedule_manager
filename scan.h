@@ -16,9 +16,9 @@ private:
     string user_name;  
 public:
     scan(string name) : user_name(name) {}
-    void scan_due_task(function<void(vector<task>&)> lock_access);
+    void scan_due_task(function<void(function<void(vector<task>&)>)>& lock_access);
     void examine_task(vector<task>& tasks) ;
-}
+};
 
 
 

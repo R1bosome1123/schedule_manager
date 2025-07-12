@@ -26,19 +26,44 @@ std::atomic<bool> stop_flag{false};
 
 
 
+int main() {
+    try {
+        boost::asio::io_context io_context;
+        tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), 8888));
+
+        std::cout << "服务器正在监听端口 8888...\n";
+
+        while (true) {
+            tcp::socket socket(io_context);
+            acceptor.accept(socket);  // 阻塞，直到新客户端连接
+
+            std::cout << "[新连接] 来自 " << socket.remote_endpoint() << "\n";
+
+            // 为每个客户端连接启动一个线程
+            std::thread(session_handler, std::move(socket)).detach();
+        }
+    } catch (std::exception& e) {
+        std::cerr << "[Fatal Error] " << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+
 void session_handler(tcp::socket socket) {
-    std::string username;
+    std::string user_name;
 
     // 1. 登录验证
-    if (!handle_login(socket, username)) {
+    if (!handle_login(socket, user_name)) {
         std::cerr << "用户登录失败，关闭连接。\n";
         return;  // 登录失败，直接退出线程
     }
-
+    vector<task> user_tasks(username);  // 当前用户的任务列表
     std::cout << "用户 " << username << " 登录成功，开始处理任务指令...\n";
 
     // 2. 任务处理循环
-    handle_client(std::move(socket), username);  // username 用于记录该用户
+    auto handle_clinet_known=[&](function<void(function<void(vector<task>&)>)> lock_access){handle_client(lock_access, std::move(socket));};
+    call_with_lock(handle_clinet_known, user_tasks, flag, mtx);
 }
 
 
@@ -62,9 +87,11 @@ bool handle_login(tcp::socket& socket, std::string& out_username) {
             request.contains("username") && request.contains("password")) {
 
             std::string username = request["username"];
-            std::string password = request["password"];
+            std::string encry_password = request["encry_password"];
 
-            if (authenticate_user(username, password)) {
+            std::string password = all_users.decrypt_password(encry_password);  // 解密密码
+
+            if (all_users.authenticate(username, password)) {
                 out_username = username;
 
                 json reply = {

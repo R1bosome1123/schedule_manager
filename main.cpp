@@ -54,13 +54,13 @@ int main()
                 scan scaner(current_user_name);
 
                 
-                auto modified_add_task=[&](){call_with_lock([&](function<void(vector<task>&)> lock_access) {
+                auto modified_add_task=[&](){call_with_lock([&](function<void(function<void(vector<task>& tasks)>)> &lock_access) {
                                                             task_manager.solve_new_task(lock_access);},
                                                              current_user_tasks,
                                                              flag,
                                                              mtx);}; 
 
-                auto modified_scan_task=[&](){call_with_lock([&](function<void(vector<task>&)> lock_access) {
+                auto modified_scan_task=[&](){call_with_lock([&](function<void(function<void(vector<task>& tasks)>)> &lock_access) {
                                                             scaner.scan_due_task(lock_access);},
                                                              current_user_tasks,
                                                              flag,

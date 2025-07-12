@@ -15,7 +15,7 @@
 #include <functional>
 #include <string>
 using namespace std;
-void task_manager::solve_new_task(function<void(vector<task>&)> lock_access)
+void task_manager::solve_new_task(function<void(function<void(vector<task>&)>)>& lock_access)
 {
         
     int mode;

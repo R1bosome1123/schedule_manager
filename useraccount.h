@@ -36,7 +36,7 @@ class usermanager
             user_password=user_password_in;
         }
     };
-
+    string decrypt_password(const string& encrypted_password);
     string current_user={};
     vector<useraccount> userlist;
 };
