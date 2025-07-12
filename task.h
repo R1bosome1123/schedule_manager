@@ -9,7 +9,7 @@
 #include<vector>
 using namespace std;
 // hash函数
-string hash_username(const string &username)
+inline string hash_username(const string &username)
 {
     hash<string> hasher;
     return to_string(hasher(username));

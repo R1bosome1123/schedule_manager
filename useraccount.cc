@@ -8,7 +8,6 @@ bool usermanager::register_user()
     {
         if (get_password())
         {
-            cout<<"注册成功!"<<endl;
             return true;
         } 
         cout << "是否继续注册？(y/n): ";
@@ -35,20 +34,31 @@ bool usermanager::get_password()
     {
         //口令加密 等之后加入函数进行修改
 
-        //已完成：将用户名和口令写入,分配ID,识别用户名是否已被注册
-        for (const auto& user : userlist) 
+        //已完成：将用户名和口令写入
+        
+        if (user_map.find(user_name) != user_map.end())
         {
-            if (user.user_name == user_name) 
-            {
-                cout << "用户名已被注册，请重试！" <<endl;
-                return false;
-            }
+            cout << "用户名已被注册，请重试！" <<endl;
+            return false;
         }
         ofstream file("account.dat",ios::app);
-        
-        file<<user_name<<" "<<user_password<<endl;
-        userlist.push_back(useraccount(user_name,user_password));
-        current_user=user_name;
+
+        //
+        char hash[crypto_pwhash_STRBYTES];
+        if (crypto_pwhash_str(hash, user_password.c_str(), user_password.length(),
+                          crypto_pwhash_OPSLIMIT_INTERACTIVE,
+                          crypto_pwhash_MEMLIMIT_INTERACTIVE) != 0) 
+        {
+            throw std::runtime_error("哈希生成失败");
+        }
+
+        string user_crypted_password=string(hash);
+
+
+        file<<user_name<<" "<<user_crypted_password<<endl;
+        user_map[user_name] = user_crypted_password; // 存储用户名和密码的映射
+
+
         return true;
     }
     else
@@ -58,30 +68,33 @@ bool usermanager::get_password()
     }    
 }
 
-//登录函数 返回1则表示登录失败，返回0表示登录成功
+//need
+
+//登录函数
 int usermanager::user_login(string user_name,string user_password)
 {
-    for (const auto& user : userlist) 
+    if (user_name.empty() || user_password.empty()) 
     {
-        if (user.user_name == user_name) 
+        cout << "用户名或密码不能为空!" <<endl;
+        return 0;
+    }
+    //检查用户名和密码是否匹配
+    if (user_map.find(user_name) != user_map.end())
+    {
+        if (password_verify(user_map[user_name],user_password))  
         {
-            if (user.user_password == user_password) 
-            {
-                current_user = user.user_name;
-                std::cout << "登入成功!" << std::endl;
-                std::cout<<"当前登录用户为"<<user_name<<std::endl;
-                return 0;
-            } 
-            else 
-            {
-                std::cout << "密码错误!" << std::endl;
-                return 1;
-            }
+            current_user = user_name;
+            std::cout << "登入成功!" << std::endl;
+            return 1;
+        } 
+        else 
+        {
+            std::cout << "密码错误!" << std::endl;
+            return 0;
         }
     }
-    
-    cout<<"用户不存在!";
-    return 1;
+    cout<<"用户不存在!"<<endl;
+    return 0;
 }
 
 //登录的重载函数
@@ -104,6 +117,63 @@ usermanager::usermanager()
     string line;
     while (std::getline(account_file, line))
     {
-        userlist.push_back(useraccount(line));
+        istringstream iss(line);
+        string user_name, user_password;
+        iss >> user_name >> user_password;
+        // 创建 useraccount 对象并添加到 userlist 中    
+        user_map[user_name] = user_password; // 存储用户名和密码的映射
+    }
+}
+
+bool usermanager::password_verify(string storedHash,string userInputPassword)
+{
+    int result = crypto_pwhash_str_verify(
+        storedHash.c_str(),        // 存储的哈希值
+        userInputPassword.c_str(), // 用户输入的密码
+        userInputPassword.size()   // 密码长度
+    );
+
+    return (result == 0); // 如果result为0，表示密码正确
+}
+
+
+string user_system()
+{
+    if (sodium_init() < 0) 
+    {
+        std::cerr << "libsodium初始化失败！" << std::endl;
+        return "quit"; // 初始化失败时应终止程序
+    }
+
+    // SetConsoleOutputCP(65001);
+    usermanager manager;
+    string flag = {};
+    while(true)
+    {
+        cout<<"请登录你的账号！"<<endl;
+        cout<<"输入1登录账号"<<endl<<
+        "输入2注册账号"<<endl
+        <<"输入3退出"<<endl;
+        cin>>flag;
+        if(flag=="1")
+        {
+            if(manager.user_login()==1)
+            {
+                string user_name = manager.get_currentuser();
+                return user_name;
+            }
+        }
+        else if(flag=="2")
+        {
+            manager.register_user();
+        }
+        else if(flag=="3")
+        {
+            return "quit";//退出程序
+        }
+        else
+        {
+            cout<<"操作不存在！"<<endl;
+        }
     }
 }

@@ -11,6 +11,7 @@ class usermanager
     bool get_password();
     int user_login();
     int user_login(string user_name,string user_password);
+    bool password_verify(string user_password,string user_password2);
 
     string get_currentuser()
     {
@@ -19,24 +20,11 @@ class usermanager
 
 
     private:
-    struct useraccount
-    {
-        string user_name,user_password;
-
-        useraccount(string strin) 
-        {   
-            istringstream iss(strin); 
-            iss >> user_name;          
-            iss >> user_password;        
-        }
-
-        useraccount(string user_name_in,string user_password_in)
-        {
-            user_name=user_name_in;
-            user_password=user_password_in;
-        }
-    };
-    string decrypt_password(const string& encrypted_password);
+    map<string, string> user_map; // 存储用户名和密码的映射
+    
     string current_user={};
-    vector<useraccount> userlist;
 };
+
+
+//这是状态机登录部分的函数，调用时修改函数名称再调用即可,返回字符串
+string user_system();

@@ -1,5 +1,5 @@
 // #include "schedule.h"
-#include "useraccou#int.h"
+#include "useraccount.h"
 #include "task.h"
 #include "FLAG.h"
 #include "task_manager.h"
@@ -15,7 +15,7 @@
 #include <functional>
 #include <string>
 using namespace std;
-void task_manager::solve_new_task(function<void(function<void(vector<task>&)>)>& lock_access)
+void task_manager::solve_new_task(function<void(function<void(vector<task>& tasks)>)> lock_access)
 {
         
     int mode;
@@ -23,11 +23,13 @@ void task_manager::solve_new_task(function<void(function<void(vector<task>&)>)>&
     switch (mode)
     {
     case 0:
-        task new_task;
-        input_change_task(new_task); // 输入任务信息
-        auto add_task_known=[&](vector<task>&tasks){add_task(new_task, tasks);};
-        lock_access(add_task_known); // 添加任务
-        break;
+        {
+            task new_task;
+            input_change_task(&new_task); // 输入任务信息，传递指针
+            auto add_task_known=[&](vector<task>&tasks){add_task(new_task, tasks);};
+            lock_access(add_task_known); // 添加任务
+            break;
+        }
         
     case 1:
         lock_access([&](vector<task>& tasks){this->show_tasks(tasks);}); // 显示当前任务
@@ -35,18 +37,13 @@ void task_manager::solve_new_task(function<void(function<void(vector<task>&)>)>&
 
     case 2:
         lock_access([&](vector<task>& tasks){this->save_tasks(tasks);}); // 保存任务到文件
-        Flag= WAIT_LOGGED_IN; // 设置标志位为等待登录
+        flag = WAIT_LOGGED_IN; // 设置标志位为等待登录
         break;
     }
 }
 
 
-// 简单 hash 函数
-string task_manager::hash_username(const string &username)
-{
-    hash<string> hasher;
-    return to_string(hasher(username));
-}
+// 简单 hash 函数现在使用全局函数
 
 void task_manager::sort_tasks(vector<task>& tasks) {
         sort(tasks.begin(), tasks.end(), [](const task& a, const task& b) {
@@ -123,4 +120,55 @@ void task_manager::show_tasks(vector<task>& tasks) const
         for(const auto &t : tasks){ /////遍历输出/////
             t.show();
         }
+}
+
+void task_manager::task_info_guide(int &mode) const {
+    cout << "\n===== 任务管理系统 =====" << endl;
+    cout << "请选择功能：\n";
+    cout << " 0 - 新建任务\n";
+    cout << " 1 - 查看当前任务\n";
+    cout << " 2 - 保存任务并退出\n";
+    cout << "请输入数字选择功能：";
+
+    cin >> mode;
+
+    if (cin.fail() || mode < 0 || mode > 2) {
+        cin.clear();
+        cin.ignore(10000, '\n');
+        cout << "输入错误，已默认为退出(2)" << endl;
+        mode = 2;
+    }
+}
+
+
+void task_manager::input_change_task(task *t){
+    cout << "请输入任务 格式: 任务名 年 月 日 时 分 提前提醒秒" << endl;
+
+    string line;
+    cin.ignore();  // 去除上次 cin 留下的 \n
+    getline(cin, line); // 一次性读取整行
+
+    istringstream iss(line);
+    string name;
+    int y, m, d, h, min, remind;
+
+    try {
+        iss >> name >> y >> m >> d >> h >> min >> remind;
+        if (iss.fail()) throw invalid_argument("输入格式错误");
+
+        // 粗略日期范围判断 
+        if (y < 2024 || y > 2100) throw invalid_argument("年份应在 2024~2100 之间");
+        if (m < 1 || m > 12) throw invalid_argument("月份范围应为 1~12");
+        if (d < 1 || d > 31) throw invalid_argument("日期范围应为 1~31");
+        if (h < 0 || h > 23) throw invalid_argument("小时范围应为 0~23");
+        if (min < 0 || min > 59) throw invalid_argument("分钟范围应为 0~59");
+        if (remind < 0) throw invalid_argument("提醒秒不能为负数");
+
+        static int id_counter = 0;   // 静态变量，每次+1
+        *t = task(name, y, m, d, h, min, remind, id_counter++);
+
+    } catch (exception& e) {
+        cerr << "输入格式错误，创建任务失败：" << e.what() << endl;
+        t->task_id = -1; // 标记为非法任务
+    }
 }

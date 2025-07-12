@@ -14,7 +14,7 @@
 #include "task_manager.h"
 using namespace std;
 
-void scan::scan_due_task(function<void(function<void(vector<task>&)>)>& lock_access)
+void scan::scan_due_task(function<void(function<void(vector<task>& tasks)>)> lock_access)
 {
         lock_access([&](vector<task>& tasks){this->examine_task(tasks);});
         this_thread::sleep_for(chrono::seconds(1)); 

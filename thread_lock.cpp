@@ -1,29 +1,4 @@
-#include <iostream>
-#include <mutex>
-#include <vector>
-#include <atomic>
-#include <thread>
-#include <functional>
+#include "thread_lock.h"
 
-#include "thread"
-#include "FLAG.h"
-using namespace std;
-
-template<typename Function, typename SharedType>
-void call_with_lock(Function task_func, SharedType& shared,atomic<FLAG>& flag,mutex& mtx) 
-{
-    
-    
-    auto lock_access = [&](function<void(SharedType&)> access_fn) {
-        lock_guard<mutex> lock(mtx);    
-        access_fn(shared);                        
-    };
-
-
-    while(flag) //SUCCESS_LOGGED_IN
-    {
-        task_func(lock_access);  
-    }
-
-}
-
+// 模板函数的实现已经在 thread_lock.h 中完成
+// 这个文件可以为空，或者包含非模板函数的实现
