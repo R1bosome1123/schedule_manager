@@ -39,6 +39,24 @@ void task_manager::solve_new_task(function<void(function<void(vector<task>& task
         lock_access([&](vector<task>& tasks){this->save_tasks(tasks);}); // 保存任务到文件
         flag = WAIT_LOGGED_IN; // 设置标志位为等待登录
         break;
+    case 3:
+        {
+            int task_id;
+            cout << "请输入要删除的任务ID: ";
+            cin >> task_id;
+            lock_access([&](vector<task>& tasks){this->delete_task(tasks, task_id);}); // 删除任务
+            break;
+        }
+    case 4:
+        {
+            int task_id;
+            cout << "请输入要修改的任务ID: ";
+            cin >> task_id;
+            task new_task;
+            input_change_task(&new_task); // 输入新任务信息
+            lock_access([&](vector<task>& tasks){this->modify_task(tasks, task_id, new_task);}); // 修改任务
+            break;
+        }
     }
 }
 
@@ -64,7 +82,7 @@ time_t task_manager::to_time_t(int year, int month, int date, int hour, int minu
     return mktime(&tm_time);
 }
 
-task_manager::task_manager(string name,vector<task>tasks) : user_name(name)
+task_manager::task_manager(string name,vector<task>& tasks) : user_name(name)
     {
         filename= hash_username(name) + ".txt"; // 文件名为用户名的哈希值
         load_tasks(tasks); // 加载任务
@@ -73,7 +91,8 @@ task_manager::task_manager(string name,vector<task>tasks) : user_name(name)
 void task_manager::save_tasks(vector<task>& tasks) {
         ofstream fout(filename, ios::trunc); // 覆盖式输出
         for (const auto& t : tasks) {
-            fout << t.toString() << std::endl;
+            if(t.task_id != -1) // id != -1
+                fout << t.toString() << std::endl;
         }
     }
 
@@ -111,6 +130,28 @@ void task_manager::add_task(const task& t,vector<task>& tasks)
     if(tasks.size() >= 5) save_tasks(tasks);//自动保存
 }
 
+void task_manager::modify_task(vector<task>& tasks, int task_id, const task& new_task) 
+{
+    auto it = find_if(tasks.begin(), tasks.end(), [&](const task& t) { return t.task_id == task_id; });
+    auto it2 = find_if(tasks.begin(), tasks.end(), [&](const task& existing) {
+        return existing.taskName == new_task.taskName && existing.startTime == new_task.startTime;
+    });
+    if (it != tasks.end()&& it2 == tasks.end()) // 确保任务存在且没有重复
+    {
+        *it = new_task; // 更新任务
+        cout << "任务已修改。" << endl;
+    } 
+    else if (it== tasks.end())
+    {
+        cout << "未找到任务ID为 " << task_id << " 的任务。" << endl;
+        cout << "修改失败!" << endl;
+    }
+    else if( it2 != tasks.end())
+    {
+        cout << "该任务已存在，修改失败！" << endl;
+    }
+}
+
 void task_manager::show_tasks(vector<task>& tasks) const 
 {
         if(tasks.size() == 0){
@@ -128,17 +169,32 @@ void task_manager::task_info_guide(int &mode) const {
     cout << " 0 - 新建任务\n";
     cout << " 1 - 查看当前任务\n";
     cout << " 2 - 保存任务并退出\n";
+    cout << " 3 - 删除任务\n";
+    cout << " 4 - 修改任务\n";
     cout << "请输入数字选择功能：";
 
     cin >> mode;
 
-    if (cin.fail() || mode < 0 || mode > 2) {
+    if (cin.fail() || mode < 0 || mode > 4) {
         cin.clear();
         cin.ignore(10000, '\n');
         cout << "输入错误，已默认为退出(2)" << endl;
         mode = 2;
     }
 }
+void task_manager::delete_task(vector<task>& tasks, int task_id) 
+    {
+        auto it = find_if(tasks.begin(), tasks.end(), [&](const task& t) { return t.task_id == task_id; });
+        if (it != tasks.end()) 
+        {
+            tasks.erase(it);
+            cout << "任务已删除。" << endl;
+        } 
+        else 
+        {
+            cout << "未找到任务ID为 " << task_id << " 的任务。" << endl;
+        }
+    }
 
 
 void task_manager::input_change_task(task *t){
@@ -157,6 +213,25 @@ void task_manager::input_change_task(task *t){
         if (iss.fail()) throw invalid_argument("输入格式错误");
 
         // 粗略日期范围判断 
+        if (y < 2024 || y > 2100) throw invalid_argument("年份应在 2024~2100 之间");
+        if (m < 1 || m > 12) throw invalid_argument("月份范围应为 1~12");
+        if (d < 1 || d > 31) throw invalid_argument("日期范围应为 1~31");
+        if (h < 0 || h > 23) throw invalid_argument("小时范围应为 0~23");
+        if (min < 0 || min > 59) throw invalid_argument("分钟范围应为 0~59");
+        if (remind < 0) throw invalid_argument("提醒秒不能为负数");
+
+        static int id_counter = 0;   // 静态变量，每次+1
+        *t = task(name, y, m, d, h, min, remind, id_counter++);
+
+    } catch (exception& e) {
+        cerr << "输入格式错误，创建任务失败：" << e.what() << endl;
+        t->task_id = -1; // 标记为非法任务
+    }
+}
+//trytry
+void task_manager::change_task(string name,int y,int m,int d,int h,int min,int remind,task *t)
+{
+    try {// 粗略日期范围判断 
         if (y < 2024 || y > 2100) throw invalid_argument("年份应在 2024~2100 之间");
         if (m < 1 || m > 12) throw invalid_argument("月份范围应为 1~12");
         if (d < 1 || d > 31) throw invalid_argument("日期范围应为 1~31");

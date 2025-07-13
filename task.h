@@ -31,5 +31,5 @@ public:
     void show() const;
     ~task(){}
 };
-
+void show_help();
 #endif

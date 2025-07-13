@@ -49,8 +49,10 @@ task task::fromString(const string& str) {
         return t;
     }
 // 显示任务提醒
-void task::show() const {
-    cout << "任务[" << taskName << "] 开始:\t" << ctime(&startTime) << " 提前 " << remind_before / 60 << " 分钟提醒" << endl;
+void task::show() const 
+{
+    if (task_id !=-1)
+        cout << "任务[" << taskName << "] 开始:\t" << ctime(&startTime) << " 提前 " << remind_before / 60 << " 分钟提醒"<<endl<<"任务id:"<<task_id<< endl;
 }
 
 //将日程格式化为string以方便存到文件
