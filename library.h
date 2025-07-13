@@ -1,6 +1,6 @@
 #include<iostream>
 #include<fstream>
-#include<string>
+#include<cstring>
 #include<sstream>
 #include<sodium.h>
 #include<map>

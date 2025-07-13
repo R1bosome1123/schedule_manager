@@ -20,10 +20,13 @@ time_t to_time_t(int year, int month, int date, int hour, int minute)
 // 命令行帮助
 void show_help()
 {
-    cout << "Usage:\n"
-         << "  myschedule run               # 交互运行\n"
-         << "  myschedule addtask <taskname> <year> <month> <day> <hour> <minute> <remind_before>\n"
-         << "  myschedule showtask          # 查看全部任务\n";
+    cout << "日程管理系统使用说明:\n"
+         << "  ./schedule_manager run               # 交互运行\n"
+         << "  ./schedule_manager <user_name> <password> addtask <taskname> <year> <month> <day> <hour> <minute> <remind_before>         #新建任务\n"
+         << "  ./schedule_manager <user_name> <password> modifytask <task_id> <taskname> <year> <month> <day> <hour> <minute> <remind_before>             #修改任务\n"
+         << "  ./schedule_manager <user_name> <password> showtask          # 查看全部任务\n"
+         << "  ./schedule_manager <user_name> <password> deletetask <task_id>        # 删除任务\n";
+
 }
 
 //将string格式日程转化为任务类型

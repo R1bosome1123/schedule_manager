@@ -84,16 +84,16 @@ int usermanager::user_login(string user_name,string user_password)
         if (password_verify(user_map[user_name],user_password))  
         {
             current_user = user_name;
-            std::cout << "登入成功!" << std::endl;
+            cout << "登入成功!" << endl<<endl;
             return 1;
         } 
         else 
         {
-            std::cout << "密码错误!" << std::endl;
+            cout << "密码错误!" << endl<<endl;
             return 0;
         }
     }
-    cout<<"用户不存在!"<<endl;
+    cout<<"用户不存在!"<<endl<<endl;
     return 0;
 }
 
@@ -141,11 +141,10 @@ string user_system()
 {
     if (sodium_init() < 0) 
     {
-        std::cerr << "libsodium初始化失败！" << std::endl;
+        cerr << "libsodium初始化失败！" << endl;
         return "quit"; // 初始化失败时应终止程序
     }
 
-    // SetConsoleOutputCP(65001);
     usermanager manager;
     string flag = {};
     while(true)
@@ -173,7 +172,7 @@ string user_system()
         }
         else
         {
-            cout<<"操作不存在！"<<endl;
+            cout<<"操作不存在！"<<endl<<endl;
         }
     }
 }
