@@ -24,7 +24,7 @@ private:
     void save_tasks(vector<task>& tasks) ;   
     void task_info_guide(int &mode) const;
 public:
-    task_manager(string name,vector<task>tasks) ;
+    task_manager(string name,vector<task>&tasks) ;
     void solve_new_task(function<void(function<void(vector<task>&)>)>& lock_access);
     
 };

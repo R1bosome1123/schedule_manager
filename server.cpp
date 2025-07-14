@@ -50,6 +50,20 @@ int main() {
 }
 
 
+class server {
+public:
+    server(io_context& io, unsigned short port) : acceptor_(io, tcp::endpoint(tcp::v4(), port)) {
+        start_accept();
+    }   
+private:
+    void start_accept() {
+        tcp::socket socket(acceptor_.get_io_context());
+        acceptor_.async_accept(socket,
+            std::bind(&server::handle_accept, this, std::placeholders::_1, std::move(socket)));
+    }
+
+}
+
 void session_handler(tcp::socket socket) {
     std::string user_name;
 
@@ -81,6 +95,8 @@ bool handle_login(tcp::socket& socket, std::string& out_username) {
         if (ec) throw boost::system::system_error(ec);
 
         // 解析 JSON 请求
+
+        // 使用 nlohmann/json 库解析 JSON 数据
         json request = json::parse(std::string(data, len));
 
         if (request.contains("type") && request["type"] == "login" &&
@@ -149,22 +165,15 @@ void handle_client(function<void(vector<task>&)> lock_access ,tcp::socket socket
 
             // 客户端请求添加任务
             if (type == "add_task") {
-                lock_access([&](vector<task> tasks){task_manager.add_task(tasks)};);  // 使用锁访问任务管理器的添加任务方法
-                //from pocket
-
-                
-                task t;
+                task new_task;
+                new_task=request["task"] // 输入任务信息
+                /*
                 t.user = request["user"];
                 t.schedule = request["task"]["title"];
-                t.time = parse_time(request["task"]["time"]); // 字符串转时间戳
-
-                // 加锁，安全地添加任务
-                {
-                    std::lock_guard<std::mutex> lock(tasks_mtx);
-                    tasks.push_back(t);
-                }
-
-                // 构造响应消息并返回客户端
+                t.time = parse_time(request["task"]["time"]);
+                */
+                auto add_task_known=[&](vector<task>&tasks){add_task(new_task, tasks);};
+                lock_access(add_task_known); // 添加任务
                 json reply = {
                     {"status", "ok"},
                     {"message", "任务添加成功"}
@@ -179,53 +188,5 @@ void handle_client(function<void(vector<task>&)> lock_access ,tcp::socket socket
     }
 }
 
-// 每秒检查一次是否有任务到期，输出提醒
-void scan_due_tasks() {
-    while (!stop_flag) {
-        {
-            std::lock_guard<std::mutex> lock(tasks_mtx);
-            time_t now = time(nullptr);
 
-            // 遍历任务列表，查找时间已到的任务
-            auto it = tasks.begin();
-            while (it != tasks.end()) {
-                if (it->time <= now) {
-                    std::cout << "提醒任务: " << it->schedule << " （用户：" << it->user << "）\n";
-                    it = tasks.erase(it); // 删除已提醒任务
-                } else {
-                    ++it;
-                }
-            }
-        }
 
-        // 暂停 1 秒后继续
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
-}
-
-int main() {
-    io_context io;
-
-    // 创建 TCP 监听器，监听 12345 端口
-    tcp::acceptor acceptor(io, tcp::endpoint(tcp::v4(), 12345));
-    std::cout << "日程管理服务启动，监听端口 12345...\n";
-
-    // 启动后台线程定时扫描任务（线程 2）
-    std::thread scanner(scan_due_tasks);
-
-    // 主线程持续接受新的客户端连接
-    while (true) {
-        tcp::socket socket(io);
-        acceptor.accept(socket);
-        std::cout << "新客户端已连接\n";
-
-        // 每个连接创建一个线程处理客户端请求
-        std::thread(handle_client, std::move(socket)).detach();
-    }
-
-    // 程序收尾，结束扫描线程（通常此处不会到达）
-    stop_flag = true;
-    scanner.join();
-
-    return 0;
-}

@@ -1,5 +1,5 @@
 // #include "schedule.h"
-#include "useraccou#int.h"
+#include "useraccout.h"
 #include "task.h"
 #include "FLAG.h"
 #include "task_manager.h"
@@ -67,7 +67,7 @@ time_t task_manager::to_time_t(int year, int month, int date, int hour, int minu
     return mktime(&tm_time);
 }
 
-task_manager::task_manager(string name,vector<task>tasks) : user_name(name)
+task_manager::task_manager(string name,vector<task>&tasks) : user_name(name)
     {
         filename= hash_username(name) + ".txt"; // 文件名为用户名的哈希值
         load_tasks(tasks); // 加载任务
