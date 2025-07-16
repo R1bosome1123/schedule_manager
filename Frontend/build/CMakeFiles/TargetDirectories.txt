@@ -1,0 +1,5 @@
+/home/heyongyi/文档/bigproj_client_final/frontend_new/build/CMakeFiles/ScheduleManagerGUI.dir
+/home/heyongyi/文档/bigproj_client_final/frontend_new/build/CMakeFiles/edit_cache.dir
+/home/heyongyi/文档/bigproj_client_final/frontend_new/build/CMakeFiles/rebuild_cache.dir
+/home/heyongyi/文档/bigproj_client_final/frontend_new/build/CMakeFiles/ScheduleManagerGUI_autogen_timestamp_deps.dir
+/home/heyongyi/文档/bigproj_client_final/frontend_new/build/CMakeFiles/ScheduleManagerGUI_autogen.dir
