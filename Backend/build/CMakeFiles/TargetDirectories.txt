@@ -1,0 +1,7 @@
+/home/pocket/my_cpp_program/HW04/Backend/build/CMakeFiles/Backend.dir
+/home/pocket/my_cpp_program/HW04/Backend/build/CMakeFiles/edit_cache.dir
+/home/pocket/my_cpp_program/HW04/Backend/build/CMakeFiles/rebuild_cache.dir
+/home/pocket/my_cpp_program/HW04/Backend/build/CMakeFiles/list_install_components.dir
+/home/pocket/my_cpp_program/HW04/Backend/build/CMakeFiles/install.dir
+/home/pocket/my_cpp_program/HW04/Backend/build/CMakeFiles/install/local.dir
+/home/pocket/my_cpp_program/HW04/Backend/build/CMakeFiles/install/strip.dir
